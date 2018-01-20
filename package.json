@@ -1,0 +1,33 @@
+{
+  "name": "jscast",
+  "version": "1.0.0",
+  "description": "onvif js app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon jscast.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donhk/jscast.git"
+  },
+  "keywords": [
+    "onvif",
+    "js"
+  ],
+  "author": "donhk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/donhk/jscast/issues"
+  },
+  "homepage": "https://github.com/donhk/jscast#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "nodemon": "^1.14.11"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  }
+}
