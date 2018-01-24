@@ -1,0 +1,45 @@
+// http://www.vogella.com/tutorials/Gradle/article.html
+// https://www.mkyong.com/gradle/gradle-create-a-jar-file-with-dependencies/
+
+String sep = File.separator
+String location = project.projectDir
+String jarName = 'cmanager'
+String jarLocation = location + sep + "build" + sep + "libs" + sep + jarName
+
+group 'jscast'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+sourceCompatibility = 1.8
+
+//Get dependencies from Maven central repository
+repositories {
+    mavenCentral()
+}
+
+//Project dependencies
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+}
+
+//create a single Jar with all dependencies
+task cjar(type: Jar) {
+    description 'Creates a jar file.'
+    manifest {
+        attributes 'Implementation-Title': 'Camera manger',
+                'Implementation-Version': version,
+                'Main-Class': 'boot.Boot'
+    }
+    baseName = jarName
+    version = null
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    doLast {
+        println "Jar file created: ${jarLocation}.jar"
+    }
+}
+
