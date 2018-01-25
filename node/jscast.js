@@ -9,7 +9,7 @@ const uniqid = require('uniqid');
 const app = express();
 
 //cameras on network
-var cameras = [];
+let cameras = [];
 
 app.listen(process.env.PORT || 6015, () => {
     console.log('listening on 6015')
@@ -44,8 +44,34 @@ app.get('/initDevices', (req, res) => {
     });
 });
 
+//TODO temp code
 app.get('/ptzx', (req, res) => {
-    move('fred', 0, 0, 0);
+    move('fred', 1, 0, 0);
+    res.json('done');
+});
+
+app.get('/ptzy', (req, res) => {
+    move('fred', 0, 1, 0);
+    res.json('done');
+});
+
+app.get('/ptzz', (req, res) => {
+    move('fred', 0, 0, 1);
+    res.json('done');
+});
+
+app.get('/ptz-x', (req, res) => {
+    move('fred', -1, 0, 0);
+    res.json('done');
+});
+
+app.get('/ptz-y', (req, res) => {
+    move('fred', 0, -1, 0);
+    res.json('done');
+});
+
+app.get('/ptz-z', (req, res) => {
+    move('fred', 0, 0, -1);
     res.json('done');
 });
 
@@ -67,5 +93,13 @@ function move(target, x, y, z) {
         return obj.name === target;
     });
     const device = camObj[0].attr; //ugly but works
-    console.log("we have the device now :)");
+    // Move the camera
+    return device.ptzMove({
+        'speed': {
+            x: x, // Speed of pan (in the range of -1.0 to 1.0)
+            y: y, // Speed of tilt (in the range of -1.0 to 1.0)
+            z: z  // Speed of zoom (in the range of -1.0 to 1.0)
+        },
+        'timeout': 1 // seconds
+    });
 }
