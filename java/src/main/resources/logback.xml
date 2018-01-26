@@ -1,18 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
 
-            <Pattern>
-                %-5level %logger{36} - %msg%n
-            </Pattern>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-        </layout>
+    <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>logFileName</key>
+            <defaultValue>head0</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${logBase}/${logFileName}.log</file>
+
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <Pattern>
+                        %d{yyyy-MM-dd HH:mm:ss} [%thread] %level %logger{35} - %msg%n
+                    </Pattern>
+                </encoder>
+
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <FileNamePattern>${DEV_HOME}/${logFileName}.%i.log.zip
+                    </FileNamePattern>
+                    <MinIndex>1</MinIndex>
+                    <MaxIndex>10</MaxIndex>
+                </rollingPolicy>
+
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <MaxFileSize>10MB</MaxFileSize>
+                </triggeringPolicy>
+
+            </appender>
+
+        </sift>
     </appender>
 
-    <root level="debug">
-        <appender-ref ref="STDOUT" />
+
+    <logger name="GLOBAL_LOGGER" level="debug" additivity="false">
+        <appender-ref ref="FILE-THREAD"/>
+    </logger>
+
+    <logger name="GLOBAL_LOGGER" level="debug" additivity="false">
+        <appender-ref ref="FILE-THREAD"/>
+    </logger>
+
+    <root level="error">
+        <appender-ref ref="FILE-THREAD"/>
     </root>
 
 </configuration>

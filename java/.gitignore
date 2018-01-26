@@ -23,7 +23,7 @@
 /subprojects/*/out
 /.teamcity/*.iml
 /.teamcity/targe
-
+*.log
 # Vim
 # ---
 *.sw[op]t
