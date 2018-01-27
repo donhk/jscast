@@ -5,8 +5,6 @@ import org.opencv.core.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-
 import static jscast.utils.Constants.FRAME_SERVER;
 import static jscast.utils.Constants.GLOBAL_LOGGER;
 
@@ -18,13 +16,9 @@ public class Boot {
     public static void main(String[] args) {
         // load the native OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        //MDC.put("logFileName", "head1");
-        System.setProperty("logBase", System.getProperty("user.dir"));
-        System.setProperty("logFileName", GLOBAL_LOGGER);
-        logger.debug("test1 {}", new Date());
-        logger.info("test2 {}", new Date());
+        logger.debug("test1 {}");
+        logger.info("test2 {}");
         frameLogger.debug("Test");
-
 
     }
 }

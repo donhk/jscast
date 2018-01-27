@@ -11,9 +11,9 @@
         </discriminator>
         <sift>
             <appender name="FILE-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-                <file>${logBase}/${logFileName}.log</file>
+                <file>${DEV_HOME}/${logFileName}.log</file>
                 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level %logger{15}#%line %msg\n</pattern>
+                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level [%F#%L] %msg\n</pattern>
                 </encoder>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                     <FileNamePattern>${DEV_HOME}/${logFileName}.%i.log.zip
@@ -28,6 +28,12 @@
         </sift>
     </appender>
 
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level [%F#%L] %msg\n</pattern>
+        </layout>
+    </appender>
+
     <appender name="FRAME_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>
             <key>logFileName</key>
@@ -35,9 +41,9 @@
         </discriminator>
         <sift>
             <appender name="FRAME-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-                <file>${logBase}/${logFileName}.log</file>
+                <file>${DEV_HOME}/${logFileName}.log</file>
                 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level %logger{15}#%line %msg\n</pattern>
+                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level [%F#%L] %msg\n</pattern>
                 </encoder>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                     <FileNamePattern>${DEV_HOME}/${logFileName}.%i.log.zip
@@ -56,11 +62,13 @@
     <logger name="APP_LOG" additivity="false">
         <level value="debug"/>
         <appender-ref ref="APP_LOG"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
     <!-- frame server -->
     <logger name="FRAME_SERVER" additivity="false">
         <level value="debug"/>
         <appender-ref ref="FRAME_LOG"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
     <root level="error">

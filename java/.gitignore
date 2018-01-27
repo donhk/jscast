@@ -8,6 +8,7 @@
 /subprojects/internal-android-performance-testing/build-android-libs
 /src/main/libs/*
 jscast/*
+logs/
 # IDEA
 # ----
 .idea

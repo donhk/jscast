@@ -4,7 +4,6 @@
 String sep = File.separator
 String location = project.projectDir
 String jarName = 'cmanager'
-String jarLocation = location + sep + "build" + sep + "libs" + sep + jarName
 
 group 'jscast'
 version '1.0'
@@ -15,6 +14,27 @@ apply plugin: 'application'
 sourceCompatibility = 1.8
 sourceCompatibility = 1.8
 
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir "resources"
+        }
+    }
+
+    test {
+        java {
+            srcDir 'test'
+        }
+        resources {
+            srcDir "resources"
+        }
+    }
+}
+
 //Get dependencies from Maven central repository
 repositories {
     mavenCentral()
@@ -23,6 +43,7 @@ repositories {
 //Project dependencies
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile fileTree(dir: './src/main/libs', include: ['*.jar'])
@@ -43,6 +64,7 @@ task cleanFolder(type: Delete) {
 //noinspection GroovyAssignabilityCheck
 task myRun(type: JavaExec) {
     dependsOn classes
+    delete "logs"
     systemProperty "java.library.path", 'src/main/libs'
     classpath = sourceSets.main.runtimeClasspath
     main = "jscast.boot.Boot"
@@ -98,6 +120,21 @@ task createTree() {
 task release() {
     description 'Dist the final product'
     dependsOn build, jar, createTree, copyRuntimeLibs, copyLatestJar, copyNative, wrappers
+}
+
+//test section
+test {
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true
+    // listen to events in the test execution lifecycle
+    beforeTest {
+        descriptor -> logger.lifecycle("Running test: ${descriptor}")
+    }
+
+    filter {
+        //specific test method
+        includeTestsMatching "*FrameServerTest*"
+    }
 }
 
 
