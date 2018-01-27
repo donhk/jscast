@@ -1,6 +1,5 @@
-package boot;
+package jscast.boot;
 
-import frames.FrameProcessor;
 import org.opencv.core.Core;
 
 import org.slf4j.Logger;
@@ -8,11 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import static utils.Constants.GLOBAL_LOGGER;
+import static jscast.utils.Constants.FRAME_SERVER;
+import static jscast.utils.Constants.GLOBAL_LOGGER;
 
 public class Boot {
 
     private static final Logger logger = LoggerFactory.getLogger(GLOBAL_LOGGER);
+    private static final Logger frameLogger = LoggerFactory.getLogger(FRAME_SERVER);
 
     public static void main(String[] args) {
         // load the native OpenCV library
@@ -20,14 +21,10 @@ public class Boot {
         //MDC.put("logFileName", "head1");
         System.setProperty("logBase", System.getProperty("user.dir"));
         System.setProperty("logFileName", GLOBAL_LOGGER);
-        logger.debug("[MAIN] Current Date : {}", new Date());
-        FrameProcessor frameProcessor = new FrameProcessor("x", "y");
-        frameProcessor.prepareStream();
-        try {
-            frameProcessor.startFrameProcessing();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        logger.debug("test1 {}", new Date());
+        logger.info("test2 {}", new Date());
+        frameLogger.debug("Test");
+
 
     }
 }

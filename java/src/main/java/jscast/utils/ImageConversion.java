@@ -1,4 +1,4 @@
-package utils;
+package jscast.utils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

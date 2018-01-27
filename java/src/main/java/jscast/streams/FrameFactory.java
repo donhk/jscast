@@ -1,4 +1,4 @@
-package streams;
+package jscast.streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
-import static utils.Constants.GLOBAL_LOGGER;
+import static jscast.utils.Constants.GLOBAL_LOGGER;
 
 public class FrameFactory {
 

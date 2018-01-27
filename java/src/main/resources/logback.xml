@@ -1,50 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <property name="DEV_HOME" value="./logs"/>
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-    <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <appender name="APP_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>
             <key>logFileName</key>
-            <defaultValue>head0</defaultValue>
+            <defaultValue>app</defaultValue>
         </discriminator>
         <sift>
             <appender name="FILE-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${logBase}/${logFileName}.log</file>
-
                 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                    <Pattern>
-                        %d{yyyy-MM-dd HH:mm:ss} [%thread] %level %logger{35} - %msg%n
-                    </Pattern>
+                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level %logger{15}#%line %msg\n</pattern>
                 </encoder>
-
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                     <FileNamePattern>${DEV_HOME}/${logFileName}.%i.log.zip
                     </FileNamePattern>
                     <MinIndex>1</MinIndex>
                     <MaxIndex>10</MaxIndex>
                 </rollingPolicy>
-
                 <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
                     <MaxFileSize>10MB</MaxFileSize>
                 </triggeringPolicy>
-
             </appender>
-
         </sift>
     </appender>
 
+    <appender name="FRAME_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>logFileName</key>
+            <defaultValue>frame</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FRAME-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${logBase}/${logFileName}.log</file>
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <pattern>%date{yy-MM-dd HH:mm:ss.SSS,GMT-5} %-5level %logger{15}#%line %msg\n</pattern>
+                </encoder>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <FileNamePattern>${DEV_HOME}/${logFileName}.%i.log.zip
+                    </FileNamePattern>
+                    <MinIndex>1</MinIndex>
+                    <MaxIndex>10</MaxIndex>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <MaxFileSize>10MB</MaxFileSize>
+                </triggeringPolicy>
+            </appender>
+        </sift>
+    </appender>
 
-    <logger name="GLOBAL_LOGGER" level="debug" additivity="false">
-        <appender-ref ref="FILE-THREAD"/>
+    <!-- App -->
+    <logger name="APP_LOG" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="APP_LOG"/>
     </logger>
-
-    <logger name="GLOBAL_LOGGER" level="debug" additivity="false">
-        <appender-ref ref="FILE-THREAD"/>
+    <!-- frame server -->
+    <logger name="FRAME_SERVER" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="FRAME_LOG"/>
     </logger>
 
     <root level="error">
-        <appender-ref ref="FILE-THREAD"/>
+        <appender-ref ref="APP_LOG"/>
     </root>
 
 </configuration>

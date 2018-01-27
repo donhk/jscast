@@ -6,7 +6,8 @@
 /subprojects/*/build
 /subprojects/docs/src/samples/*/*/build
 /subprojects/internal-android-performance-testing/build-android-libs
-
+/src/main/libs/*
+jscast/*
 # IDEA
 # ----
 .idea

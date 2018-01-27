@@ -1,4 +1,4 @@
-package frames;
+package jscast.frames;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,15 +11,15 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import streams.FrameFactory;
-import utils.ImageConversion;
+import jscast.streams.FrameFactory;
+import jscast.utils.ImageConversion;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static utils.Constants.GLOBAL_LOGGER;
+import static jscast.utils.Constants.GLOBAL_LOGGER;
 
 public class FrameProcessor {
 

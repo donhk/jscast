@@ -10,6 +10,7 @@ group 'jscast'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 sourceCompatibility = 1.8
@@ -24,22 +25,79 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compile fileTree(dir: './src/main/libs', include: ['*.jar'])
 }
 
-//create a single Jar with all dependencies
-task cjar(type: Jar) {
-    description 'Creates a jar file.'
+jar {
     manifest {
-        attributes 'Implementation-Title': 'Camera manger',
+        attributes 'Implementation-Title': 'Gradle Quickstart',
                 'Implementation-Version': version,
-                'Main-Class': 'boot.Boot'
-    }
-    baseName = jarName
-    version = null
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-    doLast {
-        println "Jar file created: ${jarLocation}.jar"
+                'Main-Class': 'jscast.boot.Boot'
     }
 }
+
+task cleanFolder(type: Delete) {
+    delete "jscast"
+}
+
+//noinspection GroovyAssignabilityCheck
+task myRun(type: JavaExec) {
+    dependsOn classes
+    systemProperty "java.library.path", 'src/main/libs'
+    classpath = sourceSets.main.runtimeClasspath
+    main = "jscast.boot.Boot"
+}
+
+clean {
+    dependsOn cleanFolder
+}
+
+task copyRuntimeLibs(type: Copy) {
+    into "jscast/libs"
+    from configurations.runtime
+}
+
+task copyNative(type: Copy) {
+    into "jscast/native"
+    from "src/main/libs"
+    exclude { details -> details.file.name.endsWith('.jar') }
+}
+
+task copyLatestJar(type: Copy) {
+    into "jscast/bin"
+    from "build/libs"
+}
+
+task wrappers() {
+    doLast {
+        new File("jscast/bin/jscast").text = """
+# Buildtime
+java -Djava.library.path=../native/ -classpath ../libs/*:${jarName}-${version}.jar jscast.boot.Boot
+"""
+        new File("jscast/bin/jscast.cmd").text = """
+@echo off
+rem Buildtime
+java -Djava.library.path=../native/ -classpath ../libs/*;${jarName}-${version}.jar jscast.boot.Boot
+"""
+    }
+}
+
+task createTree() {
+    //create final structure
+    def releaseDir = new File("jscast/libs")
+    releaseDir.mkdirs()
+    releaseDir = new File("jscast/bin")
+    releaseDir.mkdirs()
+    releaseDir = new File("jscast/logs")
+    releaseDir.mkdirs()
+    releaseDir = new File("jscast/native")
+    releaseDir.mkdirs()
+}
+
+//create project folder with compiled sources
+task release() {
+    description 'Dist the final product'
+    dependsOn build, jar, createTree, copyRuntimeLibs, copyLatestJar, copyNative, wrappers
+}
+
 
