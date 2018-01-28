@@ -68,7 +68,7 @@
     <logger name="FRAME_SERVER" additivity="false">
         <level value="debug"/>
         <appender-ref ref="FRAME_LOG"/>
-        <appender-ref ref="STDOUT"/>
+        <!-- <appender-ref ref="STDOUT"/>  -->
     </logger>
 
     <root level="error">

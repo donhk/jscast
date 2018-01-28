@@ -1,61 +1,69 @@
 package jscast.streams;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static jscast.utils.Constants.GLOBAL_LOGGER;
-
 public class FrameFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(GLOBAL_LOGGER);
-    private static final Logger outLogger = LoggerFactory.getLogger(FrameFactory.class);
+    private final Logger logger;
 
     private final String source;
     private final String destiny;
+    private final String filePattern;
+    private final String fps;
 
-    public FrameFactory(String source, String destiny) {
+    private OutputStream stdin = null;
+
+    public FrameFactory(String source, String destiny, String filePattern, String fps, Logger logger) {
         this.source = source;
         this.destiny = destiny;
+        this.filePattern = filePattern;
+        this.fps = fps;
+        this.logger = logger;
     }
 
     public void fragmentStream() throws Exception {
+        if (new File(destiny).mkdirs()) {
+            logger.error("It was no possible to create target folder " + destiny);
+            throw new IOException();
+        }
+
         List<String> args = Arrays.asList(
                 "ffmpeg",
                 "-i",
-                "rtsp://192.168.0.13:554/onvif1",
+                source,
                 "-vf",
-                "fps=1/0.03",
-                "C:\\Users\\hkfre\\Desktop\\tmp\\fram%15d.jpg"
+                "fps=" + fps,
+                destiny + File.separator + filePattern
         );
+
         ProcessBuilder processBuilder = new ProcessBuilder(args);
-        if (processBuilder.redirectErrorStream()) {
-            logger.info("error stream successfully redirected");
-        }
+        processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
+
+        stdin = process.getOutputStream();
+
         Thread outThread = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String l;
                 while ((l = reader.readLine()) != null) {
-                    outLogger.info(l);
-                    System.err.println(l);
+                    logger.info(l);
                 }
             } catch (IOException e) {
                 logger.error("Error reading stdout", e);
             }
         });
-
+        outThread.setDaemon(true);
         outThread.start();
 
-        new Thread(() -> {
+        Thread controlTread = new Thread(() -> {
             int exitCode = -1;
             try {
                 exitCode = process.waitFor();
+                logger.info("process finished");
                 outThread.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -63,6 +71,19 @@ public class FrameFactory {
             }
             logger.info("process finished with error status: " + exitCode);
             // Process completed and read all stdout and stderr here
-        }).start();
+        });
+        controlTread.setPriority(Thread.MAX_PRIORITY);
+        controlTread.start();
+    }
+
+    public void stopServer() throws IOException {
+        logger.info("Stop frame server");
+        if (stdin != null) {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
+            String quit = "q" + System.lineSeparator();
+            writer.write(quit);
+            writer.flush();
+            writer.close();
+        }
     }
 }
