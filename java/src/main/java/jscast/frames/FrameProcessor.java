@@ -2,6 +2,7 @@ package jscast.frames;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import jscast.ui.FrameSamplerController;
 import org.opencv.core.*;
 
 import org.opencv.imgproc.Imgproc;
@@ -37,18 +38,24 @@ public class FrameProcessor {
     // face cascade classifier
     private CascadeClassifier faceCascade = new CascadeClassifier();
     private int absoluteFaceSize;
-    private ImageView originalFrame;
     private final Logger logger;
     private final String filePattern;
-    private boolean captureFrames = false;
     private final long waitTime;
     private Thread capture = null;
+    private FrameSamplerController gui;
 
-    public FrameProcessor(String source, String destiny, String filePattern, String fps, long waitTime, Logger logger) {
+    public FrameProcessor(String source,
+                          String destiny,
+                          String filePattern,
+                          String fps,
+                          long waitTime,
+                          FrameSamplerController gui,
+                          Logger logger) {
         this.logger = logger;
         this.destiny = destiny;
         this.filePattern = filePattern;
         this.waitTime = waitTime;
+        this.gui = gui;
         this.imageCodecs = new Imgcodecs();
         this.frameFactory = new FrameFactory(source, destiny, filePattern, fps, xlogger);
     }
@@ -56,6 +63,19 @@ public class FrameProcessor {
     public void prepareStream() throws Exception {
         // load the classifier(s)
         if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt.xml")) {
+            System.out.println("There was a problem loading the classifier");
+            System.exit(1);
+        }
+
+        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt_tree.xml")) {
+            System.out.println("There was a problem loading the classifier");
+            System.exit(1);
+        }
+        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt2.xml")) {
+            System.out.println("There was a problem loading the classifier");
+            System.exit(1);
+        }
+        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_default.xml")) {
             System.out.println("There was a problem loading the classifier");
             System.exit(1);
         }
@@ -102,10 +122,11 @@ public class FrameProcessor {
                         file = new File(destiny, getCurrentFrameName(oldFrame));
                         Mat frame = Imgcodecs.imread(file.getAbsolutePath());
                         // face detection
-                        //detectAndDisplay(frame);
+                        detectAndDisplay(frame);
                         // convert and show the frame
-                        //Image imageToShow = ImageConversion.mat2Image(frame);
-                        //Imgcodecs.imwrite(destiny + File.separator + "p" + file.getName(), frame);
+                        Image imageToShow = ImageConversion.mat2Image(frame);
+                        gui.updateImageView(imageToShow);
+
                         if (file.delete()) {
                             logger.debug("Removing frame " + oldFrame);
                         } else {
@@ -119,16 +140,6 @@ public class FrameProcessor {
             }
         };
         capture.start();
-    }
-
-    /**
-     * Update the {@link ImageView} in the JavaFX main thread
-     *
-     * @param view  the {@link ImageView} to update
-     * @param image the {@link Image} to show
-     */
-    private void updateImageView(ImageView view, Image image) {
-        ImageConversion.onFXThread(view.imageProperty(), image);
     }
 
     private String getCurrentFrameName(long frame) {
