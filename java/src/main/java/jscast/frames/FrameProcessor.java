@@ -1,7 +1,6 @@
 package jscast.frames;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import jscast.ui.FrameSamplerController;
 import org.opencv.core.*;
 

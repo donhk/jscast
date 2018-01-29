@@ -19,7 +19,7 @@ app.get('/getDevices', (req, res) => {
     console.log('Start the discovery process.');
     onvif.startProbe().then((device_info_list) => {
         console.log(device_info_list.length + ' devices were found.');
-        res.send(JSON.stringify(device_info_list, null, '  '));
+        res.json(device_info_list);
     }).catch((error) => {
         console.error(error);
         res.json('nothing');

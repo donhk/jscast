@@ -46,6 +46,8 @@ dependencies {
     compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.8'
+    compile group: 'com.sun.jersey', name: 'jersey-json', version: '1.8'
     compile fileTree(dir: './src/main/libs', include: ['*.jar'])
 }
 
