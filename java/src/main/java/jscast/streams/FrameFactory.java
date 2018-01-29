@@ -26,9 +26,17 @@ public class FrameFactory {
     }
 
     public void fragmentStream() throws Exception {
-        if (new File(destiny).mkdirs()) {
-            logger.error("It was no possible to create target folder " + destiny);
-            throw new IOException();
+        File f = new File(destiny);
+        if (!f.exists() || !f.isDirectory()) {
+            if (!f.mkdirs()) {
+                logger.error("It was no possible to create target folder " + destiny);
+                throw new IOException();
+            }
+        } else {
+            logger.info("using existing target folder " + destiny + " cleaning");
+            for (File file : f.listFiles())
+                if (!file.isDirectory())
+                    file.delete();
         }
 
         List<String> args = Arrays.asList(

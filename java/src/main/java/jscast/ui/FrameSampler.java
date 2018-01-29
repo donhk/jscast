@@ -24,7 +24,7 @@ public class FrameSampler extends Application implements Runnable {
             Scene scene = new Scene(root, 800, 600);
             // create the stage with the given title and the previously created
             // scene
-            primaryStage.setTitle("Face Detection and Tracking");
+            primaryStage.setTitle("Frame sampler");
             primaryStage.setScene(scene);
             // show the GUI
             primaryStage.show();
@@ -33,18 +33,9 @@ public class FrameSampler extends Application implements Runnable {
             controller = loader.getController();
             controller.init();
 
-            if (controller != null) {
-                System.out.println("Controller is not null");
-            } else {
-                System.out.println("Controller is null");
-            }
-
             // set the proper behavior on closing the application
-            primaryStage.setOnCloseRequest((new EventHandler<WindowEvent>() {
-                public void handle(WindowEvent we) {
-                    controller.setClosed();
-                }
-            }));
+            primaryStage.setOnCloseRequest((we) -> controller.setClosed());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

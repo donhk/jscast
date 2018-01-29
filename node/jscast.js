@@ -1,7 +1,5 @@
 //ES6 arrow function
 //dependencies
-
-
 const onvif = require('node-onvif');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -59,37 +57,6 @@ app.post('/move', (req, res) => {
     res.json('done');
 });
 
-//TODO temp code
-app.get('/ptzx', (req, res) => {
-    move('fred', 1, 0, 0);
-    res.json('done');
-});
-
-app.get('/ptzy', (req, res) => {
-    move('fred', 0, 1, 0);
-    res.json('done');
-});
-
-app.get('/ptzz', (req, res) => {
-    move('fred', 0, 0, 1);
-    res.json('done');
-});
-
-app.get('/ptz-x', (req, res) => {
-    move('fred', -1, 0, 0);
-    res.json('done');
-});
-
-app.get('/ptz-y', (req, res) => {
-    move('fred', 0, -1, 0);
-    res.json('done');
-});
-
-app.get('/ptz-z', (req, res) => {
-    move('fred', 0, 0, -1);
-    res.json('done');
-});
-
 function processDevice(info) {
     let device = new onvif.OnvifDevice({
         xaddr: info.xaddrs[0],
@@ -98,7 +65,7 @@ function processDevice(info) {
     });
     return device.init().then(() => {
         console.log("init done");
-        const camObj = {name: 'fred', attr: device}; //uniqid()
+        const camObj = {name: uniqid(), attr: device}; //uniqid()
         cameras.push(camObj);
     });
 }

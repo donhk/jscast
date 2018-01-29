@@ -19,26 +19,36 @@ public class Boot {
     public static void main(String[] args) {
         // load the native OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        //start x
+        System.out.println("Starting GUI");
+        FrameSampler frameSampler = new FrameSampler();
+        Thread x = new Thread(frameSampler);
+        x.start();
 
-        CameraPosition cameraPosition = new CameraPosition("localhost", "6015", logger);
-        //cameraPosition.initDevices();
-        for (int i = 0; i < 5; i++) {
-            cameraPosition.move("fred", 1.0, 0.0, 0.0);
-            System.out.println("move " + i);
-            try {
-                Thread.sleep(700);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        for (int i = 0; i < 5; i++) {
-            cameraPosition.move("fred", -1.0, 0.0, 0.0);
-            System.out.println("move " + i);
-            try {
-                Thread.sleep(700);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+        System.out.println("Starting FrameProcessor");
+        FrameProcessor frameProcessor = new FrameProcessor(
+                "rtsp://192.168.0.13:554/onvif1",
+                "C:\\tmp",
+                "fram%15d.jpg",
+                "1/0.08",
+                20,
+                frameSampler.getController(),
+                logger
+        );
+
+        try {
+            frameProcessor.prepareStream();
+            frameProcessor.startFrameProcessing();
+            Thread.sleep(1000 * 60 * 50);
+            frameProcessor.stopFrameProcessor();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

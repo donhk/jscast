@@ -24,7 +24,7 @@ public class FrameSamplerController {
      * On application close, stop the acquisition from the camera
      */
     public void setClosed() {
-
+        System.exit(0);
     }
 
     /**

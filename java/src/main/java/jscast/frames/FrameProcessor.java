@@ -59,22 +59,25 @@ public class FrameProcessor {
         this.frameFactory = new FrameFactory(source, destiny, filePattern, fps, xlogger);
     }
 
+    private String classifierPath(String classifierName) throws IOException {
+        return new File(getClass().getResource("/haarcascades/" + classifierName).getFile()).getCanonicalPath();
+    }
+
     public void prepareStream() throws Exception {
         // load the classifier(s)
-        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt.xml")) {
+        if (!faceCascade.load(classifierPath("haarcascade_frontalface_alt.xml"))) {
             System.out.println("There was a problem loading the classifier");
             System.exit(1);
         }
-
-        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt_tree.xml")) {
+        if (!faceCascade.load(classifierPath("haarcascade_frontalface_alt_tree.xml"))) {
             System.out.println("There was a problem loading the classifier");
             System.exit(1);
         }
-        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_alt2.xml")) {
+        if (!faceCascade.load(classifierPath("haarcascade_frontalface_alt2.xml"))) {
             System.out.println("There was a problem loading the classifier");
             System.exit(1);
         }
-        if (!faceCascade.load("out/production/resources/haarcascades/haarcascade_frontalface_default.xml")) {
+        if (!faceCascade.load(classifierPath("haarcascade_frontalface_default.xml"))) {
             System.out.println("There was a problem loading the classifier");
             System.exit(1);
         }
@@ -104,26 +107,27 @@ public class FrameProcessor {
 
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
-                    File file;
-                    do {
+                    File file = new File(destiny, getCurrentFrameName(currentFrame));
+                    while (!file.canRead()) {
+                        logger.debug("waiting for " + file.getAbsolutePath());
                         try {
                             Thread.sleep(waitTime);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                         file = new File(destiny, getCurrentFrameName(currentFrame));
-                        System.out.println("waiting for " + file.getAbsolutePath());
-                    } while (!file.canRead());
+                    }
 
                     //was there a previous loop?
                     if (oldFrame != currentFrame) {
-                        System.out.println("current frame [" + currentFrame + "] old frame[" + oldFrame + "]");
+                        logger.debug("current frame [" + currentFrame + "] old frame[" + oldFrame + "]");
                         file = new File(destiny, getCurrentFrameName(oldFrame));
                         Mat frame = Imgcodecs.imread(file.getAbsolutePath());
                         // face detection
                         detectAndDisplay(frame);
                         // convert and show the frame
                         Image imageToShow = ImageConversion.mat2Image(frame);
+                        //Imgcodecs.imwrite(destiny + File.separator + "p" + file.getName(), frame);
                         gui.updateImageView(imageToShow);
 
                         if (file.delete()) {
