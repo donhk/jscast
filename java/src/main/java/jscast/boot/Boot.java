@@ -21,7 +21,25 @@ public class Boot {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         CameraPosition cameraPosition = new CameraPosition("localhost", "6015", logger);
-        cameraPosition.initDevices();
+        //cameraPosition.initDevices();
+        for (int i = 0; i < 5; i++) {
+            cameraPosition.move("fred", 1.0, 0.0, 0.0);
+            System.out.println("move " + i);
+            try {
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < 5; i++) {
+            cameraPosition.move("fred", -1.0, 0.0, 0.0);
+            System.out.println("move " + i);
+            try {
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 }

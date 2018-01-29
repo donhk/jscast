@@ -5,6 +5,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import jscast.pojos.Coord;
 import jscast.pojos.DeviceHead;
 import jscast.pojos.onvif.Camera;
 import jscast.pojos.onvif.OnvifDevice;
@@ -14,6 +15,7 @@ public class CameraPosition {
 
     private final String url;
     private final Logger logger;
+    private final Gson gson = new Gson();
 
     public CameraPosition(String host, String port, Logger logger) {
         url = "http://" + host + ":" + port;
@@ -35,7 +37,6 @@ public class CameraPosition {
 
         String output = response.getEntity(String.class);
         logger.warn("Deserializing response");
-        Gson gson = new Gson();
         DeviceHead[] deviceHeads = gson.fromJson(output, DeviceHead[].class);
         logger.info("Devices found: " + deviceHeads.length);
         StringBuilder sb = new StringBuilder(System.lineSeparator());
@@ -52,12 +53,32 @@ public class CameraPosition {
         return deviceHeads;
     }
 
-    public void move(String x, String y, String z) {
+    public void move(String target, String x, String y, String z) {
+        logger.info("Getting list of devices from " + url + "/move");
+        Client client = Client.create();
+        WebResource webResource = client.resource(url + "/move");
+        Coord coord = new Coord(target, x, y, z);
+        String input = gson.toJson(coord);
+        logger.debug(input);
+        ClientResponse response
+                = webResource
+                .accept("application/json")
+                .type("application/json")
+                .post(ClientResponse.class, input);
 
+        if (response.getStatus() != 200) {
+            logger.warn("Failed : HTTP error code : " + response.getStatus());
+        } else {
+            logger.warn("Request finished: " + response.getStatus());
+        }
+    }
+
+    public void move(String target, double x, double y, double z) {
+        move(target, String.valueOf(x), String.valueOf(y), String.valueOf(z));
     }
 
     public Camera[] initDevices() {
-        logger.info("Getting list of devices from " + url + "/initDevices");
+        logger.info("Init devices " + url + "/initDevices");
         Client client = Client.create();
         WebResource webResource = client.resource(url + "/initDevices");
         ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
@@ -70,7 +91,6 @@ public class CameraPosition {
 
         String output = response.getEntity(String.class);
         logger.warn("Deserializing response");
-        Gson gson = new Gson();
         Camera[] cameras = gson.fromJson(output, Camera[].class);
         logger.info("Devices found: " + cameras.length);
         StringBuilder sb = new StringBuilder(System.lineSeparator());

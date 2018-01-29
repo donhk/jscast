@@ -1,6 +1,7 @@
-'use strict';
 //ES6 arrow function
 //dependencies
+
+
 const onvif = require('node-onvif');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -8,12 +9,16 @@ const uniqid = require('uniqid');
 
 const app = express();
 
-//cameras on network
-let cameras = [];
+//You must make sure that you define all configurations BEFORE defining routes.
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.listen(process.env.PORT || 6015, () => {
     console.log('listening on 6015')
 });
+
+//cameras on network
+let cameras = [];
 
 app.get('/getDevices', (req, res) => {
     console.log('Start the discovery process.');
@@ -42,6 +47,16 @@ app.get('/initDevices', (req, res) => {
         console.error(error);
         res.json('nothing');
     });
+});
+
+//Content-type application/json
+app.post('/move', (req, res) => {
+    console.log(req.body);
+    let x = parseFloat(req.body.x);
+    let y = parseFloat(req.body.y);
+    let z = parseFloat(req.body.z);
+    move(req.body.target, x, y, z);
+    res.json('done');
 });
 
 //TODO temp code
@@ -103,3 +118,4 @@ function move(target, x, y, z) {
         'timeout': 1 // seconds
     });
 }
+
