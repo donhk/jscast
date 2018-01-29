@@ -41,7 +41,7 @@ public class FrameProcessor {
     private final String filePattern;
     private final long waitTime;
     private Thread capture = null;
-    private FrameSamplerController gui;
+    private FrameSamplerController gui = null;
 
     public FrameProcessor(String source,
                           String destiny,
@@ -105,6 +105,7 @@ public class FrameProcessor {
         capture = new Thread() {
             long oldFrame = 1L;
 
+            @Override
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
                     File file = new File(destiny, getCurrentFrameName(currentFrame));
@@ -142,6 +143,7 @@ public class FrameProcessor {
                 }
             }
         };
+        capture.setName("FrameCapture");
         capture.start();
     }
 
@@ -172,13 +174,18 @@ public class FrameProcessor {
         }
 
         // detect faces
-        faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+        faceCascade.detectMultiScale(
+                grayFrame,
+                faces,
+                1.1,
+                2,
+                Objdetect.CASCADE_SCALE_IMAGE,
                 new Size(absoluteFaceSize, absoluteFaceSize), new Size());
 
         // each rectangle in faces is a face: draw them!
         Rect[] facesArray = faces.toArray();
-        for (int i = 0; i < facesArray.length; i++) {
-            Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
+        for (Rect face : facesArray) {
+            Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
         }
     }
 

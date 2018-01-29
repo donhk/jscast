@@ -1,23 +1,21 @@
 package jscast.ui;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class FrameSampler extends Application implements Runnable {
 
-    private static FrameSamplerController controller;
+    private static FrameSamplerController controller = null;
 
     @Override
     public void start(Stage primaryStage) {
         try {
             // load the FXML resource
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fmview.fxml"));
-            BorderPane root = (BorderPane) loader.load();
+            BorderPane root = loader.load();
             // set a whitesmoke background
             root.setStyle("-fx-background-color: whitesmoke;");
             // create and style a scene

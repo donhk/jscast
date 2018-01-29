@@ -19,30 +19,29 @@ public class Boot {
     public static void main(String[] args) {
         // load the native OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        //start x
-        System.out.println("Starting GUI");
-        FrameSampler frameSampler = new FrameSampler();
-        Thread x = new Thread(frameSampler);
-        x.start();
 
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            //start x
+            System.out.println("Starting GUI");
+            FrameSampler frameSampler = new FrameSampler();
+            Thread x = new Thread(frameSampler);
+            x.setName("FrameSampler");
+            x.start();
 
-        System.out.println("Starting FrameProcessor");
-        FrameProcessor frameProcessor = new FrameProcessor(
-                "rtsp://192.168.0.13:554/onvif1",
-                "C:\\tmp",
-                "fram%15d.jpg",
-                "1/0.08",
-                20,
-                frameSampler.getController(),
-                logger
-        );
+            do {
+                Thread.sleep(100);
+            } while (frameSampler.getController() == null);
 
-        try {
+            FrameProcessor frameProcessor = new FrameProcessor(
+                    "rtsp://192.168.0.13:554/onvif1",
+                    "C:\\tmp",
+                    "fram%15d.jpg",
+                    "1/1",
+                    20,
+                    frameSampler.getController(),
+                    logger
+            );
+
             frameProcessor.prepareStream();
             frameProcessor.startFrameProcessing();
             Thread.sleep(1000 * 60 * 50);
