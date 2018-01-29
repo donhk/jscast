@@ -1,6 +1,7 @@
 package jscast.frames;
 
 import javafx.scene.image.Image;
+import jscast.pojos.Wrapper;
 import jscast.ui.FrameSamplerController;
 import org.opencv.core.*;
 
@@ -17,12 +18,14 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Observable;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static jscast.utils.Constants.FRAME_SERVER;
 
-public class FrameProcessor {
+public class FrameProcessor extends Observable {
 
     private static final Logger xlogger = LoggerFactory.getLogger(FRAME_SERVER);
     // the OpenCV object that performs the video capture
@@ -124,6 +127,7 @@ public class FrameProcessor {
                         logger.debug("current frame [" + currentFrame + "] old frame[" + oldFrame + "]");
                         file = new File(destiny, getCurrentFrameName(oldFrame));
                         Mat frame = Imgcodecs.imread(file.getAbsolutePath());
+
                         // face detection
                         detectAndDisplay(frame);
                         // convert and show the frame
@@ -159,6 +163,7 @@ public class FrameProcessor {
     private void detectAndDisplay(Mat frame) {
         MatOfRect faces = new MatOfRect();
         Mat grayFrame = new Mat();
+        Rect frameReference = new Rect(0, 0, frame.width(), frame.height());
 
         // convert the frame in gray scale
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
@@ -180,12 +185,19 @@ public class FrameProcessor {
                 1.1,
                 2,
                 Objdetect.CASCADE_SCALE_IMAGE,
-                new Size(absoluteFaceSize, absoluteFaceSize), new Size());
+                new Size(absoluteFaceSize, absoluteFaceSize), new Size()
+        );
 
         // each rectangle in faces is a face: draw them!
         Rect[] facesArray = faces.toArray();
+
         for (Rect face : facesArray) {
             Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
+        }
+        if (facesArray.length > 0) {
+            System.out.println("Notify observers");
+            setChanged();
+            notifyObservers(new Wrapper(frameReference, facesArray));
         }
     }
 
