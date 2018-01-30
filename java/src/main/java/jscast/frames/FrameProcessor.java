@@ -163,7 +163,8 @@ public class FrameProcessor extends Observable {
     private void detectAndDisplay(Mat frame) {
         MatOfRect faces = new MatOfRect();
         Mat grayFrame = new Mat();
-        Rect frameReference = new Rect(0, 0, frame.width(), frame.height());
+
+        Rect fullArea = new Rect(0, 0, frame.width(), frame.height());
 
         // convert the frame in gray scale
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
@@ -194,10 +195,11 @@ public class FrameProcessor extends Observable {
         for (Rect face : facesArray) {
             Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
         }
-        if (facesArray.length > 0) {
-            System.out.println("Notify observers");
+        //only for 1 for now TODO avg of many points
+        if (facesArray.length == 1) {
+            System.out.println("Notify observers of " + (currentFrame - 1));
             setChanged();
-            notifyObservers(new Wrapper(frameReference, facesArray));
+            notifyObservers(new Wrapper(fullArea, facesArray));
         }
     }
 

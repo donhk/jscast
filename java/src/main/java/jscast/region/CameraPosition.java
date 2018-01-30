@@ -54,7 +54,7 @@ public class CameraPosition {
     }
 
     public void move(String target, String x, String y, String z) {
-        logger.info("Getting list of devices from " + url + "/move");
+        logger.info("Updating position " + url + "/move");
         Client client = Client.create();
         WebResource webResource = client.resource(url + "/move");
         Coord coord = new Coord(target, x, y, z);

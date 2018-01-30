@@ -32,7 +32,7 @@ public class Boot {
             String source = testCam.attr.current_profile.stream.udp;
             String destiny = "C:\\tmp";
             String filePattern = "fram%15d.jpg";
-            String fps = "1/1";
+            String fps = "1/0.1";
 
             //start x
             System.out.println("Starting GUI");
@@ -55,7 +55,7 @@ public class Boot {
                     frameSampler.getController(),
                     logger
             );
-            PositionManager positionManager = new PositionManager(testCam, logger);
+            PositionManager positionManager = new PositionManager(testCam, cameraPosition, logger);
 
             //add observer to frame processor
             frameProcessor.addObserver(positionManager);
