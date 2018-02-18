@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Observable;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -207,11 +206,7 @@ public class FrameProcessor extends Observable {
         if (capture != null) {
             logger.info("Stop frame processor");
             capture.interrupt();
-            try {
-                frameFactory.stopServer();
-            } catch (IOException e) {
-                //ignored
-            }
+            frameFactory.stopServer();
             currentFrame = 0L;
         }
     }

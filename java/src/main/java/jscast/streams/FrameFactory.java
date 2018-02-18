@@ -26,6 +26,11 @@ public class FrameFactory {
     }
 
     public void fragmentStream() throws Exception {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Killing process with hook");
+            stopServer();
+        }
+        ));
         File f = new File(destiny);
         if (!f.exists() || !f.isDirectory()) {
             if (!f.mkdirs()) {
@@ -64,7 +69,7 @@ public class FrameFactory {
                 logger.error("Error reading stdout", e);
             }
         });
-        outThread.setDaemon(true);
+        outThread.setDaemon(false);
         outThread.start();
 
         Thread controlTread = new Thread(() -> {
@@ -80,18 +85,24 @@ public class FrameFactory {
             logger.info("process finished with error status: " + exitCode);
             // Process completed and read all stdout and stderr here
         });
-        controlTread.setPriority(Thread.MAX_PRIORITY);
+        controlTread.setPriority(Thread.NORM_PRIORITY);
         controlTread.start();
+
+
     }
 
-    public void stopServer() throws IOException {
+    public void stopServer() {
         logger.info("Stop frame server");
         if (stdin != null) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
             String quit = "q" + System.lineSeparator();
-            writer.write(quit);
-            writer.flush();
-            writer.close();
+            try {
+                writer.write(quit);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                logger.warn(e.getMessage(), e);
+            }
         }
     }
 }

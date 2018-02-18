@@ -1,4 +1,4 @@
-package jscast.region;
+package jscast.devices;
 
 import jscast.pojos.Point;
 import jscast.pojos.Wrapper;
@@ -16,9 +16,9 @@ public class PositionManager implements Observer {
     private String name;
     private OnvifDevice onvifDevice;
     private Logger logger;
-    private CameraPosition cameraPosition;
+    private DeviceControl cameraPosition;
 
-    public PositionManager(Camera camera, CameraPosition cameraPosition, Logger logger) {
+    public PositionManager(Camera camera, DeviceControl cameraPosition, Logger logger) {
         this.name = camera.name;
         this.onvifDevice = camera.attr;
         this.logger = logger;
@@ -41,6 +41,7 @@ public class PositionManager implements Observer {
         double rx = center.x - correctionX;
         double ry = center.y - correctionY;
 
+        //TODO move this outside this method
         Rect hotArea = new Rect((int) rx, (int) ry, (int) hotW, (int) hotH);
 
         System.out.println("hot area x " + hotArea.x + " y " + hotArea.y + " w " + hotArea.width + " h " + hotArea.height);
