@@ -30,6 +30,8 @@ public class FrameServerTest {
                 "C:\\tmp",
                 "fram%15d.jpg",
                 "1/0.5",
+                1200,
+                960,
                 logger
         );
         try {

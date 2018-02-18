@@ -1,7 +1,6 @@
 package jscast.devices;
 
 import jscast.pojos.Point;
-import jscast.pojos.Wrapper;
 import jscast.pojos.onvif.Camera;
 import jscast.pojos.onvif.OnvifDevice;
 import org.opencv.core.Rect;
@@ -17,38 +16,27 @@ public class PositionManager implements Observer {
     private OnvifDevice onvifDevice;
     private Logger logger;
     private DeviceControl cameraPosition;
+    private Rect mainArea;
+    private Rect hotArea;
+    private Point center;
 
-    public PositionManager(Camera camera, DeviceControl cameraPosition, Logger logger) {
+    public PositionManager(Camera camera, DeviceControl cameraPosition, Rect mainArea, Rect hotArea, Point center, Logger logger) {
         this.name = camera.name;
         this.onvifDevice = camera.attr;
         this.logger = logger;
         this.cameraPosition = cameraPosition;
+        this.mainArea = mainArea;
+        this.hotArea = hotArea;
+        this.center = center;
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        Wrapper wrapper = (Wrapper) arg;
-        //get center of reference
-        Point center = new Point(wrapper.getReference().width / 2, wrapper.getReference().height / 2);
-        System.out.println("Center of frame " + center.toString());
-
-        //calculate rectangle used to measure relative position
-        double pct = 0.4;
-        double hotW = wrapper.getReference().width * pct;
-        double hotH = wrapper.getReference().height * pct;
-        double correctionX = hotW * 0.5;
-        double correctionY = hotH * 0.5;
-        double rx = center.x - correctionX;
-        double ry = center.y - correctionY;
-
-        //TODO move this outside this method
-        Rect hotArea = new Rect((int) rx, (int) ry, (int) hotW, (int) hotH);
-
-        System.out.println("hot area x " + hotArea.x + " y " + hotArea.y + " w " + hotArea.width + " h " + hotArea.height);
+        Rect[] targets = (Rect[]) arg;
 
         //calculate each target
         ArrayList<Point> points = new ArrayList<>();
-        for (Rect rect : wrapper.getTargets()) {
+        for (Rect rect : targets) {
             double dx = rect.x + (rect.width / 2);
             double dy = rect.y + (rect.height / 2);
             points.add(new Point(dx, dy));

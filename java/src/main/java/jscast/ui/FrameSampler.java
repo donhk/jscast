@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 public class FrameSampler extends Application implements Runnable {
 
     private static FrameSamplerController controller = null;
+    private String title = "frame sampler";
 
     @Override
     public void start(Stage primaryStage) {
@@ -22,7 +23,7 @@ public class FrameSampler extends Application implements Runnable {
             Scene scene = new Scene(root, 800, 600);
             // create the stage with the given title and the previously created
             // scene
-            primaryStage.setTitle("Frame sampler");
+            primaryStage.setTitle(title);
             primaryStage.setScene(scene);
             // show the GUI
             primaryStage.show();
@@ -46,5 +47,9 @@ public class FrameSampler extends Application implements Runnable {
 
     public FrameSamplerController getController() {
         return controller;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

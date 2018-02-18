@@ -1,7 +1,7 @@
 package jscast.frames;
 
 import javafx.scene.image.Image;
-import jscast.pojos.Wrapper;
+import jscast.pojos.Point;
 import jscast.ui.FrameSamplerController;
 import org.opencv.core.*;
 
@@ -44,21 +44,38 @@ public class FrameProcessor extends Observable {
     private final long waitTime;
     private Thread capture = null;
     private FrameSamplerController gui = null;
+    private Rect hotArea;
+    private Rect mainArea;
+    private org.opencv.core.Point center;
+    private org.opencv.core.Point l1p1;
+    private org.opencv.core.Point l1p2;
+    private org.opencv.core.Point l2p1;
+    private org.opencv.core.Point l2p2;
 
     public FrameProcessor(String source,
                           String destiny,
                           String filePattern,
                           String fps,
                           long waitTime,
-                          FrameSamplerController gui,
+                          Rect mainArea,
+                          Rect hotArea,
+                          Point center,
                           Logger logger) {
         this.logger = logger;
         this.destiny = destiny;
         this.filePattern = filePattern;
         this.waitTime = waitTime;
-        this.gui = gui;
         this.imageCodecs = new Imgcodecs();
-        this.frameFactory = new FrameFactory(source, destiny, filePattern, fps, xlogger);
+        this.frameFactory = new FrameFactory(source, destiny, filePattern, fps, mainArea.width, mainArea.height, xlogger);
+        this.hotArea = hotArea;
+        this.mainArea = mainArea;
+        this.center = new org.opencv.core.Point(center.x, center.y);
+        //horizontal
+        this.l1p1 = new org.opencv.core.Point(0, center.y);
+        this.l1p2 = new org.opencv.core.Point(((double) mainArea.width), center.y);
+        //vertical
+        this.l2p1 = new org.opencv.core.Point(center.x, 0);
+        this.l2p2 = new org.opencv.core.Point(center.x, ((double) mainArea.height));
     }
 
     private String classifierPath(String classifierName) throws IOException {
@@ -127,13 +144,16 @@ public class FrameProcessor extends Observable {
                         file = new File(destiny, getCurrentFrameName(oldFrame));
                         Mat frame = Imgcodecs.imread(file.getAbsolutePath());
 
+                        //put some marks
+                        freeDraw(frame);
                         // face detection
                         detectAndDisplay(frame);
                         // convert and show the frame
                         Image imageToShow = ImageConversion.mat2Image(frame);
                         //Imgcodecs.imwrite(destiny + File.separator + "p" + file.getName(), frame);
-                        gui.updateImageView(imageToShow);
-
+                        if (gui != null) {
+                            gui.updateImageView(imageToShow);
+                        }
                         if (file.delete()) {
                             logger.debug("Removing frame " + oldFrame);
                         } else {
@@ -152,6 +172,14 @@ public class FrameProcessor extends Observable {
 
     private String getCurrentFrameName(long frame) {
         return fileNamePrefix + String.join("", Collections.nCopies((totalDigits - String.valueOf(frame).length()), "0")) + frame + fileNameExt;
+    }
+
+    private void freeDraw(Mat frame) {
+        Imgproc.rectangle(frame, hotArea.tl(), hotArea.br(), new Scalar(255, 0, 102), 3);
+        Imgproc.rectangle(frame, mainArea.tl(), mainArea.br(), new Scalar(0, 255, 0), 3);
+        Imgproc.line(frame, l1p1, l1p2, new Scalar(255, 0, 255), 2);
+        Imgproc.line(frame, l2p1, l2p2, new Scalar(255, 0, 255), 2);
+        Imgproc.circle(frame, center, 1, new Scalar(102, 255, 255), 8);
     }
 
     /**
@@ -182,8 +210,8 @@ public class FrameProcessor extends Observable {
         faceCascade.detectMultiScale(
                 grayFrame,
                 faces,
-                1.1,
-                2,
+                1.3,
+                4,
                 Objdetect.CASCADE_SCALE_IMAGE,
                 new Size(absoluteFaceSize, absoluteFaceSize), new Size()
         );
@@ -198,7 +226,7 @@ public class FrameProcessor extends Observable {
         if (facesArray.length == 1) {
             System.out.println("Notify observers of " + (currentFrame - 1));
             setChanged();
-            notifyObservers(new Wrapper(fullArea, facesArray));
+            notifyObservers(facesArray);
         }
     }
 
@@ -209,5 +237,13 @@ public class FrameProcessor extends Observable {
             frameFactory.stopServer();
             currentFrame = 0L;
         }
+    }
+
+    public FrameSamplerController getGui() {
+        return gui;
+    }
+
+    public void setGui(FrameSamplerController gui) {
+        this.gui = gui;
     }
 }

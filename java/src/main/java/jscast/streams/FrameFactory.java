@@ -14,14 +14,24 @@ public class FrameFactory {
     private final String destiny;
     private final String filePattern;
     private final String fps;
+    private final int width;
+    private final int height;
 
     private OutputStream stdin = null;
 
-    public FrameFactory(String source, String destiny, String filePattern, String fps, Logger logger) {
+    public FrameFactory(String source,
+                        String destiny,
+                        String filePattern,
+                        String fps,
+                        int width,
+                        int height,
+                        Logger logger) {
         this.source = source;
         this.destiny = destiny;
         this.filePattern = filePattern;
         this.fps = fps;
+        this.width = width;
+        this.height = height;
         this.logger = logger;
     }
 
@@ -48,11 +58,13 @@ public class FrameFactory {
                 "ffmpeg",
                 "-i",
                 source,
+                "-s",
+                width + "x" + height,
                 "-vf",
                 "fps=" + fps,
                 destiny + File.separator + filePattern
         );
-
+        System.out.println(args);
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
