@@ -1,7 +1,6 @@
 package jscast.frames;
 
 import javafx.scene.image.Image;
-import jscast.pojos.Point;
 import jscast.ui.FrameSamplerController;
 import org.opencv.core.*;
 
@@ -12,7 +11,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 import org.slf4j.Logger;
 import jscast.streams.FrameFactory;
-import jscast.utils.ImageConversion;
+import jscast.utils.FrameTools;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -46,11 +45,7 @@ public class FrameProcessor extends Observable {
     private FrameSamplerController gui = null;
     private Rect hotArea;
     private Rect mainArea;
-    private org.opencv.core.Point center;
-    private org.opencv.core.Point l1p1;
-    private org.opencv.core.Point l1p2;
-    private org.opencv.core.Point l2p1;
-    private org.opencv.core.Point l2p2;
+    private Point center;
 
     public FrameProcessor(String source,
                           String destiny,
@@ -69,13 +64,7 @@ public class FrameProcessor extends Observable {
         this.frameFactory = new FrameFactory(source, destiny, filePattern, fps, mainArea.width, mainArea.height, xlogger);
         this.hotArea = hotArea;
         this.mainArea = mainArea;
-        this.center = new org.opencv.core.Point(center.x, center.y);
-        //horizontal
-        this.l1p1 = new org.opencv.core.Point(0, center.y);
-        this.l1p2 = new org.opencv.core.Point(((double) mainArea.width), center.y);
-        //vertical
-        this.l2p1 = new org.opencv.core.Point(center.x, 0);
-        this.l2p2 = new org.opencv.core.Point(center.x, ((double) mainArea.height));
+        this.center = center;
     }
 
     private String classifierPath(String classifierName) throws IOException {
@@ -149,7 +138,7 @@ public class FrameProcessor extends Observable {
                         // face detection
                         detectAndDisplay(frame);
                         // convert and show the frame
-                        Image imageToShow = ImageConversion.mat2Image(frame);
+                        Image imageToShow = FrameTools.mat2Image(frame);
                         //Imgcodecs.imwrite(destiny + File.separator + "p" + file.getName(), frame);
                         if (gui != null) {
                             gui.updateImageView(imageToShow);
@@ -177,9 +166,7 @@ public class FrameProcessor extends Observable {
     private void freeDraw(Mat frame) {
         Imgproc.rectangle(frame, hotArea.tl(), hotArea.br(), new Scalar(255, 0, 102), 3);
         Imgproc.rectangle(frame, mainArea.tl(), mainArea.br(), new Scalar(0, 255, 0), 3);
-        Imgproc.line(frame, l1p1, l1p2, new Scalar(255, 0, 255), 2);
-        Imgproc.line(frame, l2p1, l2p2, new Scalar(255, 0, 255), 2);
-        Imgproc.circle(frame, center, 1, new Scalar(102, 255, 255), 8);
+        FrameTools.profileTarget(frame, mainArea);
     }
 
     /**
@@ -211,7 +198,7 @@ public class FrameProcessor extends Observable {
                 grayFrame,
                 faces,
                 1.3,
-                4,
+                2,
                 Objdetect.CASCADE_SCALE_IMAGE,
                 new Size(absoluteFaceSize, absoluteFaceSize), new Size()
         );
@@ -221,10 +208,12 @@ public class FrameProcessor extends Observable {
 
         for (Rect face : facesArray) {
             Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
+            FrameTools.profileTarget(frame, face);
+            FrameTools.measurePoints(frame, FrameTools.getCenter(face), center);
         }
-        //only for 1 for now TODO avg of many points
-        if (facesArray.length == 1) {
-            System.out.println("Notify observers of " + (currentFrame - 1));
+
+        //only for 1 for now
+        if (facesArray.length > 0) {
             setChanged();
             notifyObservers(facesArray);
         }

@@ -39,8 +39,6 @@ public class Boot {
             Camera testCam = cameras[0];
             ExecutorService executor = Executors.newFixedThreadPool(1);
             executor.submit(new CameraWorker(testCam, localhost, port, logger));
-            executor.awaitTermination(5000, TimeUnit.SECONDS);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

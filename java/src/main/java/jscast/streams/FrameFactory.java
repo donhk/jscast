@@ -64,7 +64,7 @@ public class FrameFactory {
                 "fps=" + fps,
                 destiny + File.separator + filePattern
         );
-        System.out.println(args);
+        //System.out.println(args);
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();

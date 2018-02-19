@@ -1,7 +1,6 @@
 package jscast.control;
 
 import jscast.frames.FrameProcessor;
-import jscast.pojos.Point;
 import jscast.pojos.onvif.Camera;
 import jscast.devices.DeviceControl;
 import jscast.devices.PositionManager;
@@ -9,6 +8,8 @@ import jscast.ui.FrameSampler;
 
 import java.util.concurrent.Callable;
 
+import jscast.utils.FrameTools;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.slf4j.Logger;
 
@@ -26,7 +27,7 @@ public class CameraWorker implements Callable<String> {
         this.source = camera.attr.current_profile.stream.udp;
         this.destiny = "C:\\tmp";
         this.filePattern = camera.name + "fra%15d.jpg";
-        this.fps = "1/0.5";
+        this.fps = "1/0.1";
         this.logger = logger;
         this.controller = new DeviceControl(localhost, port, logger);
     }
@@ -37,23 +38,14 @@ public class CameraWorker implements Callable<String> {
         int width = Integer.parseInt(camera.attr.current_profile.video.encoder.resolution.width);
         int height = Integer.parseInt(camera.attr.current_profile.video.encoder.resolution.height);
 
-        System.out.println("width> " + width + " height> " + height);
-        //get center of reference
-        Point center = new Point(width / 2, height / 2);
-        System.out.println("Center of frame " + center.toString());
-
-        //calculate rectangle used to measure relative position
-        double pct = 0.7;
-        double hotW = width * pct;
-        double hotH = height * pct;
-        double correctionX = hotW * 0.5;
-        double correctionY = hotH * 0.5;
-        double rx = center.x - correctionX;
-        double ry = center.y - correctionY;
-
         //create reference areas
         Rect mainArea = new Rect(0, 0, width, height);
-        Rect hotArea = new Rect((int) rx, (int) ry, (int) hotW, (int) hotH);
+        //get center of reference
+        Point center = FrameTools.getCenter(mainArea);
+        Rect hotArea = FrameTools.calculateHotArea(mainArea, center, 0.7);
+
+        System.out.println("width> " + width + " height> " + height);
+        System.out.println("Center of frame " + center.toString());
 
         //start the code in charge of collect the frames from the stream
         //and analyze each frame
