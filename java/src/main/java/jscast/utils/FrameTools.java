@@ -55,6 +55,13 @@ public class FrameTools {
         );
     }
 
+    /**
+     * TODO KdTree to search
+     * http://pointclouds.org/documentation/tutorials/kdtree_search.php
+     *
+     * @param targets
+     * @return
+     */
     public static Point keyPoint(Rect[] targets) {
         Point point = null;
         for (Rect target : targets) {
