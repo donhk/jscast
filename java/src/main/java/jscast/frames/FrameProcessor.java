@@ -178,8 +178,6 @@ public class FrameProcessor extends Observable {
         MatOfRect faces = new MatOfRect();
         Mat grayFrame = new Mat();
 
-        Rect fullArea = new Rect(0, 0, frame.width(), frame.height());
-
         // convert the frame in gray scale
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
         // equalize the frame histogram to improve the result
@@ -197,10 +195,11 @@ public class FrameProcessor extends Observable {
         faceCascade.detectMultiScale(
                 grayFrame,
                 faces,
-                1.3,
-                2,
+                1.1,
+                3,
                 Objdetect.CASCADE_SCALE_IMAGE,
-                new Size(absoluteFaceSize, absoluteFaceSize), new Size()
+                new Size(absoluteFaceSize, absoluteFaceSize),
+                new Size()
         );
 
         // each rectangle in faces is a face: draw them!
@@ -226,10 +225,6 @@ public class FrameProcessor extends Observable {
             frameFactory.stopServer();
             currentFrame = 0L;
         }
-    }
-
-    public FrameSamplerController getGui() {
-        return gui;
     }
 
     public void setGui(FrameSamplerController gui) {

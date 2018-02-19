@@ -27,7 +27,7 @@ public class CameraWorker implements Callable<String> {
         this.source = camera.attr.current_profile.stream.udp;
         this.destiny = "C:\\tmp";
         this.filePattern = camera.name + "fra%15d.jpg";
-        this.fps = "1/0.1";
+        this.fps = "1/0.2";
         this.logger = logger;
         this.controller = new DeviceControl(localhost, port, logger);
     }
@@ -42,7 +42,7 @@ public class CameraWorker implements Callable<String> {
         Rect mainArea = new Rect(0, 0, width, height);
         //get center of reference
         Point center = FrameTools.getCenter(mainArea);
-        Rect hotArea = FrameTools.calculateHotArea(mainArea, center, 0.7);
+        Rect hotArea = FrameTools.calculateHotArea(mainArea, center, 0.4);
 
         System.out.println("width> " + width + " height> " + height);
         System.out.println("Center of frame " + center.toString());
@@ -64,7 +64,7 @@ public class CameraWorker implements Callable<String> {
         x.start();
         //wait until the gui is fully loaded
         do {
-            Thread.sleep(100);
+            Thread.sleep(300);
         } while (frameSampler.getController() == null);
         frameProcessor.setGui(frameSampler.getController());
 
