@@ -18,7 +18,9 @@ the device communication works with NodeJS v9.6.1 and it uses node-onvif v0.1.2 
 the node server is a rest API which communicates with the devices and has 3 functions
 
 /**getDevices** - broadcasts the network looking for devices that want to handshake with us
+
 /**initDevices** - gathers all the data of a given device
+
 /**move** - receives motion instruction which are transmitted to the specified device
 
 the data analysis is done by Java, the flow goes like this
