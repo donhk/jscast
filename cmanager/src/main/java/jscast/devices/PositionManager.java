@@ -7,10 +7,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.slf4j.Logger;
 
-import java.util.Observable;
-import java.util.Observer;
-
-public class PositionManager implements Observer {
+public class PositionManager {
 
     private String name;
     private OnvifDevice onvifDevice;
@@ -30,10 +27,7 @@ public class PositionManager implements Observer {
         this.center = center;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        Rect[] targets = (Rect[]) arg;
-
+    public void update(Rect[] targets) {
 
         //if there is more than one target, lets calculate an avg point
         //based on all the targets found

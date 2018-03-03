@@ -12,6 +12,7 @@ import jscast.utils.FrameTools;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.slf4j.Logger;
+import rx.Observable;
 
 public class CameraWorker implements Callable<String> {
     private final Camera camera;
@@ -53,7 +54,9 @@ public class CameraWorker implements Callable<String> {
         PositionManager positionManager = new PositionManager(camera, controller, mainArea, hotArea, center, logger);
 
         //add observer to frame processor
-        frameProcessor.addObserver(positionManager);
+        Observable<Rect[]> observable = frameProcessor.getObservable();
+        observable.subscribe(positionManager::update);
+
         frameProcessor.prepareStream();
         frameProcessor.startFrameProcessing();
 

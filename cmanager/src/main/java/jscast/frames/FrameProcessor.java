@@ -17,13 +17,16 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Observable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rx.Observable;
+import rx.functions.Action1;
+import rx.subjects.PublishSubject;
+
 import static jscast.utils.Constants.FRAME_SERVER;
 
-public class FrameProcessor extends Observable {
+public class FrameProcessor {
 
     private static final Logger xlogger = LoggerFactory.getLogger(FRAME_SERVER);
     // the OpenCV object that performs the video capture
@@ -46,6 +49,7 @@ public class FrameProcessor extends Observable {
     private Rect hotArea;
     private Rect mainArea;
     private Point center;
+    private PublishSubject<Rect[]> subject = PublishSubject.create();
 
     public FrameProcessor(String source,
                           String destiny,
@@ -211,10 +215,15 @@ public class FrameProcessor extends Observable {
             FrameTools.measurePoints(frame, FrameTools.getCenter(face), center);
         }
 
+        //TODO test code
+        Rect face = new Rect(400, 50, 250, 350);
+        Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
+        FrameTools.profileTarget(frame, face);
+        FrameTools.measurePoints(frame, FrameTools.getCenter(face), center);
+
         //only for 1 for now
         if (facesArray.length > 0) {
-            setChanged();
-            notifyObservers(facesArray);
+            subject.onNext(facesArray);
         }
     }
 
@@ -229,5 +238,9 @@ public class FrameProcessor extends Observable {
 
     public void setGui(FrameSamplerController gui) {
         this.gui = gui;
+    }
+
+    public Observable<Rect[]> getObservable() {
+        return subject.asObservable();
     }
 }
