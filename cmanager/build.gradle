@@ -4,6 +4,7 @@
 String sep = File.separator
 String location = project.projectDir
 String jarName = 'cmanager'
+String releaseDir = 'build/jscast/'
 
 group 'jscast'
 version '1.0'
@@ -48,6 +49,7 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.8'
     compile group: 'com.sun.jersey', name: 'jersey-json', version: '1.8'
+    compile group: 'io.reactivex', name: 'rxjava', version: '1.2.10'
     compile fileTree(dir: './src/main/libs', include: ['*.jar'])
 }
 
@@ -77,28 +79,28 @@ clean {
 }
 
 task copyRuntimeLibs(type: Copy) {
-    into "jscast/libs"
+    into releaseDir + "libs"
     from configurations.runtime
 }
 
 task copyNative(type: Copy) {
-    into "jscast/native"
+    into releaseDir + "native"
     from "src/main/libs"
     exclude { details -> details.file.name.endsWith('.jar') }
 }
 
 task copyLatestJar(type: Copy) {
-    into "jscast/bin"
+    into releaseDir + "bin"
     from "build/libs"
 }
 
 task wrappers() {
     doLast {
-        new File("jscast/bin/jscast").text = """
+        new File(releaseDir + "bin/jscast").text = """
 # Buildtime
 java -Djava.library.path=../native/ -classpath ../libs/*:${jarName}-${version}.jar jscast.boot.Boot
 """
-        new File("jscast/bin/jscast.cmd").text = """
+        new File(releaseDir + "bin/jscast.cmd").text = """
 @echo off
 rem Buildtime
 java -Djava.library.path=../native/ -classpath ../libs/*;${jarName}-${version}.jar jscast.boot.Boot
@@ -106,16 +108,21 @@ java -Djava.library.path=../native/ -classpath ../libs/*;${jarName}-${version}.j
     }
 }
 
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
 task createTree() {
     //create final structure
-    def releaseDir = new File("jscast/libs")
-    releaseDir.mkdirs()
-    releaseDir = new File("jscast/bin")
-    releaseDir.mkdirs()
-    releaseDir = new File("jscast/logs")
-    releaseDir.mkdirs()
-    releaseDir = new File("jscast/native")
-    releaseDir.mkdirs()
+    def file = new File(releaseDir + "libs")
+    file.mkdirs()
+    file = new File(releaseDir + "bin")
+    file.mkdirs()
+    file = new File(releaseDir + "logs")
+    file.mkdirs()
+    file = new File(releaseDir + "native")
+    file.mkdirs()
 }
 
 //create project folder with compiled sources
