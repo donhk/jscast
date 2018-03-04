@@ -7,6 +7,8 @@ This software allows controlling onvif devices (IP cameras) and gives to them
 the ability of track objects if the IP camera has movement capabilities.
 The software is designed to work for `ARM64` and `x86_64`
 
+https://www.youtube.com/watch?v=Tt7qhQurQbg
+
 ## Description
 The below information is the latest so far, I might change the code or add new features :p before
 update the below documentation but I will try to keep it up to date
