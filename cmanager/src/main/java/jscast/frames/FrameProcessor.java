@@ -208,18 +208,20 @@ public class FrameProcessor {
 
         // each rectangle in faces is a face: draw them!
         Rect[] facesArray = faces.toArray();
+        ////TODo, remove below code, testing code
+        //Rect x = new Rect(400, 50, 250, 340);
+        //if (facesArray.length == 0) {
+        //    facesArray = new Rect[1];
+        //    facesArray[0] = x;
+        //} else {
+        //    facesArray[0] = x;
+        //}
 
         for (Rect face : facesArray) {
             Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
             FrameTools.profileTarget(frame, face);
             FrameTools.measurePoints(frame, FrameTools.getCenter(face), center);
         }
-
-        //TODO test code
-        Rect face = new Rect(400, 50, 250, 350);
-        Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0), 3);
-        FrameTools.profileTarget(frame, face);
-        FrameTools.measurePoints(frame, FrameTools.getCenter(face), center);
 
         //only for 1 for now
         if (facesArray.length > 0) {
