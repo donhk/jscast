@@ -32,7 +32,7 @@ the data analysis is done by Java, the flow goes like this
 ## Camera workflow
 start a thread which will create a process to break the rstp stream from the camera into frames
 start a thread which will read the current frame, transform it into a Matrix (we use OpenCV for this) and
-apply haar classifier to each frame to detect interesting objects (like a face or motion)
+apply haar classifier to each frame to detect interesting objects (like a faces or motion)
 
 if an object is found, a rectangle will be created around the object and an event will be triggered by ab observer which will verify if the object is outside of the hot area (a rectangle contained within the image of configurable size)
 if the object is outside of this area, an instruction of motion will be sent to the device to try to center the object, in the meantime, the matrix is transformed into the image and a JavaFX image container will be updated with the result
