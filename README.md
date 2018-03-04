@@ -23,7 +23,7 @@ the node server is a rest API which communicates with the devices and has 3 func
 
 /**move** - receives motion instruction which are transmitted to the specified device
 
-the data analysis is done by Java, the flow goes like this
+the data analysis is done by Java 9, the flow goes like this
 
  1. java calls to node server to start a broadcast, node returns to use a json array with the devices found
  2. java creates an object from the result and for each device, it asks node to initialize its data 
